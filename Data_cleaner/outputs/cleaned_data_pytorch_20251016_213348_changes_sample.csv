@@ -1,9 +1,0 @@
-column,operation,original_value,new_value,row_index,timestamp,cleaner_type
-rating,fallback_imputation,,Unknown,0,2025-10-16 21:33:48.730443,pytorch_encoder
-rating,fallback_imputation,,Unknown,1,2025-10-16 21:33:48.730472,pytorch_encoder
-rating,fallback_imputation,,Unknown,2,2025-10-16 21:33:48.730478,pytorch_encoder
-rating,fallback_imputation,,Unknown,3,2025-10-16 21:33:48.730484,pytorch_encoder
-date,fallback_imputation,,Unknown,0,2025-10-16 21:33:48.731419,pytorch_encoder
-date,fallback_imputation,,Unknown,1,2025-10-16 21:33:48.731429,pytorch_encoder
-date,fallback_imputation,,Unknown,2,2025-10-16 21:33:48.731435,pytorch_encoder
-date,fallback_imputation,,Unknown,3,2025-10-16 21:33:48.731442,pytorch_encoder

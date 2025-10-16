@@ -1,0 +1,7 @@
+column,operation,original_value,new_value,row_index,timestamp
+merchant_category,fillna_categorical,,Unknown,,2025-10-16T18:50:33.422882
+location_zip,fillna_categorical,,Unknown,,2025-10-16T18:50:33.424934
+years_in_business,fillna_categorical,,Unknown,,2025-10-16T18:50:33.426455
+avg_transaction_value,fillna_categorical,,Unknown,,2025-10-16T18:50:33.428211
+chargeback_rate,fillna_categorical,,Unknown,,2025-10-16T18:50:33.429771
+risk_tier,fillna_categorical,,Unknown,,2025-10-16T18:50:33.431246

@@ -1,0 +1,89 @@
+{
+  "report_metadata": {
+    "total_changes": 6,
+    "report_generated": "2025-10-16T18:50:33.535302",
+    "time_range": {
+      "first_change": "2025-10-16T18:50:33.422882",
+      "last_change": "2025-10-16T18:50:33.431246"
+    }
+  },
+  "changes_by_operation": {
+    "fillna_categorical": 6
+  },
+  "changes_by_column": {
+    "merchant_category": 1,
+    "location_zip": 1,
+    "years_in_business": 1,
+    "avg_transaction_value": 1,
+    "chargeback_rate": 1,
+    "risk_tier": 1
+  },
+  "data_quality_metrics": {
+    "missing_values_filled": 6,
+    "anomalies_detected": 0,
+    "standardizations": 0,
+    "conversions": 0,
+    "corrections": 0
+  },
+  "most_active_rows": {},
+  "change_patterns": {
+    "operations_per_column": {
+      "avg_transaction_value": 1,
+      "chargeback_rate": 1,
+      "location_zip": 1,
+      "merchant_category": 1,
+      "risk_tier": 1,
+      "years_in_business": 1
+    },
+    "most_common_transformations": {
+      "avg_transaction_value_fillna_categorical": 1,
+      "chargeback_rate_fillna_categorical": 1,
+      "location_zip_fillna_categorical": 1,
+      "merchant_category_fillna_categorical": 1,
+      "risk_tier_fillna_categorical": 1,
+      "years_in_business_fillna_categorical": 1
+    }
+  },
+  "sample_changes": [
+    {
+      "column": "merchant_category",
+      "operation": "fillna_categorical",
+      "original_value": null,
+      "new_value": "Unknown",
+      "row_index": null,
+      "timestamp": "2025-10-16T18:50:33.422882"
+    },
+    {
+      "column": "location_zip",
+      "operation": "fillna_categorical",
+      "original_value": null,
+      "new_value": "Unknown",
+      "row_index": null,
+      "timestamp": "2025-10-16T18:50:33.424934"
+    },
+    {
+      "column": "years_in_business",
+      "operation": "fillna_categorical",
+      "original_value": null,
+      "new_value": "Unknown",
+      "row_index": null,
+      "timestamp": "2025-10-16T18:50:33.426455"
+    },
+    {
+      "column": "avg_transaction_value",
+      "operation": "fillna_categorical",
+      "original_value": null,
+      "new_value": "Unknown",
+      "row_index": null,
+      "timestamp": "2025-10-16T18:50:33.428211"
+    },
+    {
+      "column": "chargeback_rate",
+      "operation": "fillna_categorical",
+      "original_value": null,
+      "new_value": "Unknown",
+      "row_index": null,
+      "timestamp": "2025-10-16T18:50:33.429771"
+    }
+  ]
+}

@@ -16,15 +16,14 @@ class PyTorchEncoderCleaner(UniversalDataCleaner):
         self.is_fitted = False
         
     def _log_change(self, column, operation, original_value, new_value, row_index=None):
-        """Log changes made during cleaning"""
+        """Log changes with string conversion for dates"""
         change = {
             'column': column,
             'operation': operation,
-            'original_value': original_value,
-            'new_value': new_value,
+            'original_value': str(original_value) if original_value is not None else None,
+            'new_value': str(new_value) if new_value is not None else None,
             'row_index': row_index,
-            'timestamp': pd.Timestamp.now(),
-            'cleaner_type': 'pytorch_encoder'
+            'timestamp': pd.Timestamp.now().isoformat()
         }
         self.change_log.append(change)
     

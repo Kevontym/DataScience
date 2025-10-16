@@ -8,7 +8,6 @@ import os
 import argparse
 from pathlib import Path
 import json
-import env_paths
 
 
 def check_docker_environment():
@@ -455,6 +454,7 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 
                 self.all_data = pd.DataFrame()
                 self.cleaner_type = cleaner_type
+                self.change_log = []
             
             def save_change_report(self, filepath, reports_dir=None):
                 """
@@ -462,7 +462,8 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 - CSV/Data files go to outputs/
                 - Change reports go to reports/
                 """
-                if not self.change_log:
+                # Use the cleaner's change_log
+                if not self.cleaner.change_log:
                     print("📊 No changes to report")
                     return
                 
@@ -479,7 +480,7 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 reports_path.mkdir(parents=True, exist_ok=True)
                 
                 base_name = Path(filepath).stem
-                change_df = pd.DataFrame(self.change_log)
+                change_df = pd.DataFrame(self.cleaner.change_log)
                 
                 print(f"📊 Saving change report for {len(change_df):,} changes...")
                 print(f"   📁 Reports location: {reports_path}")
@@ -497,7 +498,8 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 # 2. SQLITE: Queryable database (goes to reports/)
                 db_path = reports_path / f"{base_name}_changes.db"
                 try:
-                    self._save_to_sqlite(change_df, db_path)
+                    # FIX: Use the cleaner's method
+                    self.cleaner._save_to_sqlite(change_df, db_path)
                     db_size = db_path.stat().st_size / 1024
                     print(f"   🗃️  SQLite (queryable): {db_path} ({db_size:.1f} KB)")
                 except Exception as e:
@@ -507,7 +509,8 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 # 3. JSON SUMMARY: Executive overview (goes to reports/)
                 summary_path = reports_path / f"{base_name}_changes_summary.json"
                 try:
-                    summary = self._generate_comprehensive_summary(change_df)
+                    # FIX: Use the cleaner's method
+                    summary = self.cleaner._generate_comprehensive_summary(change_df)
                     with open(summary_path, 'w') as f:
                         json.dump(summary, f, indent=2, default=str)
                     summary_size = summary_path.stat().st_size / 1024
@@ -677,7 +680,18 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
         pipeline.save_to_csv(unique_output_path)
         
         # Save change report with matching unique filename
-        pipeline.save_change_report(unique_output_path, env_paths['reports'])
+        def get_reports_path():
+            """Get reports directory path"""
+            # Check Docker environment first
+            if os.path.exists('/.dockerenv'):
+                return '/app/reports/'
+            else:
+                return 'reports/'
+
+        # Then in run_pipeline:
+        reports_dir = 'reports/'  # Simple default
+        pipeline.save_change_report(unique_output_path, reports_dir)
+
         
         # ✅ FIXED: STORE IN SQL DATABASE IF REQUESTED
         if use_sql_storage and sql_manager:
