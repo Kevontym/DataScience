@@ -57,6 +57,8 @@ DATA_CLEANER/
 2. Navigate to the folder: `cd Data_cleaner`  
 3. Run: `python run.py`
 
+4. For Vs code users its best to open the SQL using an extension instead of the terminal. The db will be saved to your local default port
+
 ### Option 2: Git Sparse Checkout:
 ```bash
 mkdir my-cleaner && cd my-cleaner
