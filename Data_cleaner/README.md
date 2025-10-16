@@ -44,111 +44,27 @@ DATA_CLEANER/
 ### Using Docker (Recommended)
 
 1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd DATA_CLEANER
+## Quick Start
+# DataClean Pro - NLP Data Cleaning & SQL Analysis
 
-    # Or
-   ./run-docker.sh
+> **Note**: This project is part of a larger DataScience repository. 
+> You only need the `Data_cleaner/` folder to run this tool.
 
+## 🚀 Quick Start (Just This Project)
 
-Set up Python environment
+### Option 1: Download & Run (Easiest):
+1. **Download only the `Data_cleaner` folder** from this repository
+2. Navigate to the folder: `cd Data_cleaner`  
+3. Run: `python run.py`
 
-bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-Install dependencies
-
-bash
-pip install -r requirements.txt
-Run the pipeline
-
-bash
-python main.py
-# or
+### Option 2: Git Sparse Checkout:
+```bash
+mkdir my-cleaner && cd my-cleaner
+git clone --filter=blob:none --sparse https://github.com/Kevontym/DataScience
+cd DataScience
+git sparse-checkout set Data_cleaner
+cd Data_cleaner
 python run.py
-
-
-
-Data Format
-The pipeline processes customer data files with the naming convention:
-
-cleaned_customer_data_pytorch_YYYYMM.csv
-
-Processed data is stored in the data/processed/ directory with timestamps.
-
-🔧 Configuration
-Environment Variables
-Create a .env file for configuration:
-
-env
-DATA_PATH=/app/data
-DB_PATH=/app/report_gen.db
-LOG_LEVEL=INFO
-Docker Configuration
-Modify docker-compose.yml for:
-
-Resource limits
-
-Volume mounts
-
-Network settings
-
-🧪 Testing
-Generate sample data for testing:
-
-bash
-python create_sample_data.py
-📈 ML Pipeline Components
-Anomaly Detection
-Identifies unusual patterns in customer data
-
-# Configurable detection thresholds
-
-###Feature Engineering
-###Automated feature creation and selection
-
-# Support for temporal features
-
-Smart Repair
-Automated data correction
-
-Missing value imputation
-
-Data validation rules
-
-# 🗃️ Database
-The application uses SQLite (report_gen.db) for storing:
-
-Processing metadata
-
-Pipeline execution logs
-
-Analysis reports
-
-# 🚢 Deployment
-Production Deployment
-Build the image
-
-bash
-docker build -t data-cleaner:latest .
-Run with production settings
-
-bash
-docker-compose -f docker-compose.prod.yml up -d
-Kubernetes (Optional)
-See the k8s/ directory for Kubernetes manifests.
-
-# 🤝 Contributing
-Fork the repository
-
-Create a feature branch (git checkout -b feature/amazing-feature)
-
-Commit your changes (git commit -m 'Add amazing feature')
-
-Push to the branch (git push origin feature/amazing-feature)
-
-Open a Pull Request
 
 # 📝 License
 This project is licensed under the MIT License - see the LICENSE file for details.
