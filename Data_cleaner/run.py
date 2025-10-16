@@ -6,6 +6,38 @@ Handles all path issues and provides consistent entry point
 import sys
 import os
 import argparse
+from pathlib import Path
+import json
+import env_paths
+
+
+def check_docker_environment():
+    """Check if running in Docker and adjust paths if needed"""
+    import os
+    if os.path.exists('/.dockerenv'):
+        print("🐳 Running in Docker container")
+        print("   📁 Inputs: /app/data/raw/")
+        print("   📁 Data Outputs: /app/outputs/")
+        print("   📁 Change Reports: /app/reports/")
+        return {
+            'structured': '/app/data/raw/customer_data.csv',
+            'unstructured': '/app/data/raw/reviews/',
+            'output': '/app/outputs/cleaned_data.csv',
+            'reports': '/app/reports/'  # ← Make sure this exists
+        }
+    else:
+        print("💻 Running locally")
+        print("   📁 Inputs: data/raw/")
+        print("   📁 Data Outputs: data/processed/")
+        print("   📁 Change Reports: reports/")
+        return {
+            'structured': 'data/raw/customer_data.csv',
+            'unstructured': 'data/raw/reviews/',
+            'output': 'data/processed/cleaned_customer_data.csv',
+            'reports': 'reports/'  # ← Make sure this exists
+        }
+
+
 
 def setup_environment():
     """Set up Python path and environment - COMPLETELY PORTABLE"""
@@ -424,13 +456,85 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
                 self.all_data = pd.DataFrame()
                 self.cleaner_type = cleaner_type
             
-            def save_change_report(self, filepath):
-                """Save detailed change report in multiple formats"""
-                if hasattr(self.cleaner, 'save_change_report'):
-                    # The cleaner now handles all four formats automatically
-                    self.cleaner.save_change_report(filepath)
+            def save_change_report(self, filepath, reports_dir=None):
+                """
+                Save changes in multiple formats for different use cases
+                - CSV/Data files go to outputs/
+                - Change reports go to reports/
+                """
+                if not self.change_log:
+                    print("📊 No changes to report")
+                    return
+                
+                # Ensure output directory exists
+                output_dir = Path(filepath).parent
+                output_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Use provided reports directory or default to output directory
+                if reports_dir:
+                    reports_path = Path(reports_dir)
                 else:
-                    print("⚠️  Cleaner doesn't support enhanced change reporting")
+                    reports_path = output_dir / "changes"
+                
+                reports_path.mkdir(parents=True, exist_ok=True)
+                
+                base_name = Path(filepath).stem
+                change_df = pd.DataFrame(self.change_log)
+                
+                print(f"📊 Saving change report for {len(change_df):,} changes...")
+                print(f"   📁 Reports location: {reports_path}")
+                
+                # 1. PARQUET: Full detailed changes (goes to reports/)
+                parquet_path = reports_path / f"{base_name}_changes.parquet"
+                try:
+                    change_df.to_parquet(parquet_path, index=False, compression='snappy')
+                    parquet_size = parquet_path.stat().st_size / 1024
+                    print(f"   📁 Parquet (full): {parquet_path} ({parquet_size:.1f} KB)")
+                except Exception as e:
+                    print(f"   ❌ Parquet failed: {e}")
+                    parquet_path = None
+                
+                # 2. SQLITE: Queryable database (goes to reports/)
+                db_path = reports_path / f"{base_name}_changes.db"
+                try:
+                    self._save_to_sqlite(change_df, db_path)
+                    db_size = db_path.stat().st_size / 1024
+                    print(f"   🗃️  SQLite (queryable): {db_path} ({db_size:.1f} KB)")
+                except Exception as e:
+                    print(f"   ❌ SQLite failed: {e}")
+                    db_path = None
+                
+                # 3. JSON SUMMARY: Executive overview (goes to reports/)
+                summary_path = reports_path / f"{base_name}_changes_summary.json"
+                try:
+                    summary = self._generate_comprehensive_summary(change_df)
+                    with open(summary_path, 'w') as f:
+                        json.dump(summary, f, indent=2, default=str)
+                    summary_size = summary_path.stat().st_size / 1024
+                    print(f"   📋 JSON (summary): {summary_path} ({summary_size:.1f} KB)")
+                except Exception as e:
+                    print(f"   ❌ JSON summary failed: {e}")
+                    summary_path = None
+                
+                # 4. CSV SAMPLE: Human-readable sample (goes to reports/)
+                sample_path = reports_path / f"{base_name}_changes_sample.csv"
+                try:
+                    sample_size = min(1000, len(change_df))
+                    change_df.head(sample_size).to_csv(sample_path, index=False)
+                    sample_file_size = sample_path.stat().st_size / 1024
+                    print(f"   🔍 CSV (sample): {sample_path} ({sample_file_size:.1f} KB, {sample_size} rows)")
+                except Exception as e:
+                    print(f"   ❌ CSV sample failed: {e}")
+                    sample_path = None
+                
+                # Print usage instructions
+                print("\n💡 Usage:")
+                if db_path:
+                    print(f"   Query: sqlite3 '{db_path}' \"SELECT * FROM changes LIMIT 5;\"")
+                if parquet_path:
+                    print(f"   Analyze: pd.read_parquet('{parquet_path}')")
+                if summary_path:
+                    print(f"   Overview: cat '{summary_path}' | jq .")
 
             
             def add_structured_data(self, source_path, source_type='csv'):
@@ -573,7 +677,7 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
         pipeline.save_to_csv(unique_output_path)
         
         # Save change report with matching unique filename
-        pipeline.save_change_report(unique_output_path)
+        pipeline.save_change_report(unique_output_path, env_paths['reports'])
         
         # ✅ FIXED: STORE IN SQL DATABASE IF REQUESTED
         if use_sql_storage and sql_manager:
@@ -612,6 +716,9 @@ def run_pipeline(cleaner_type='traditional', structured_path='data/raw/customer_
         traceback.print_exc()
 
 def main():
+    # Get environment-aware paths FIRST
+    env_paths = check_docker_environment()
+    
     parser = argparse.ArgumentParser(description='Data Cleaning Pipeline')
     parser.add_argument('--ml', action='store_true', help='Use ML-enhanced cleaning')
     parser.add_argument('--traditional', action='store_true', help='Use traditional cleaning')
@@ -621,12 +728,12 @@ def main():
     parser.add_argument('--sql-storage', action='store_true', help='Store results in SQL database')
     parser.add_argument('--sql-terminal', action='store_true', help='Open SQL interactive terminal after run')
     
-    # ADD THESE MISSING ARGUMENTS:
-    parser.add_argument('--structured', type=str, default='data/raw/customer_data.csv', 
+    # ✅ ONLY DEFINE THESE ONCE with Docker-aware defaults
+    parser.add_argument('--structured', type=str, default=env_paths['structured'], 
                        help='Path to structured data file')
-    parser.add_argument('--unstructured', type=str, default='data/raw/reviews/',
+    parser.add_argument('--unstructured', type=str, default=env_paths['unstructured'],
                        help='Path to unstructured data directory')
-    parser.add_argument('--output', type=str, default='data/processed/cleaned_customer_data.csv',
+    parser.add_argument('--output', type=str, default=env_paths['output'],
                        help='Output file path')
     
     args = parser.parse_args()

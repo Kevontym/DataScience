@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  data-cleaner:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./outputs:/app/outputs
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONPATH=/app
+
+  # Optional: SQLite web interface for easy browsing
+  sqlite-web:
+    image: coleifer/sqlite-web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./report_gen.db:/data/report_gen.db
+    depends_on:
+      - data-cleaner
