@@ -1,7 +1,7 @@
 pandas>=1.5.0
 numpy>=1.21.0
 scikit-learn>=1.0.0
-torch>=1.9.0
+torch>=1.9.0 #If in conda (Recommended) use conda install pytorch::pytorch this gives you torch and pytorch found it easier this way
 sqlalchemy>=1.4.0
 python-dateutil>=2.8.0
 pathlib2>=2.3.0; python_version < '3.4'
