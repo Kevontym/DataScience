@@ -112,7 +112,7 @@ class PyTorchEncoderCleaner(UniversalDataCleaner):
             self.change_log.extend(basic_cleaner.change_log)
             
         except Exception as e:
-            print(f"⚠️  Basic cleaning failed, using fallback: {e}")
+            print(f" Basic cleaning failed, using fallback: {e}")
             # Fallback: just handle missing values
             df = self.handle_missing_values_fallback(df)
         
@@ -169,7 +169,7 @@ class PyTorchEncoderCleaner(UniversalDataCleaner):
         for column in df.columns:
             null_count = df[column].isnull().sum()
             if null_count > 0:
-                print(f"🔄 PyTorch-enhanced imputation for {column}")
+                print(f" PyTorch-enhanced imputation for {column}")
                 
                 # For now, use median/mean (replace with neural imputation)
                 if pd.api.types.is_numeric_dtype(df[column]):
@@ -191,7 +191,7 @@ class PyTorchEncoderCleaner(UniversalDataCleaner):
         
         if pytorch_changes:
             print("\n" + "="*50)
-            print("🔥 PYTORCH ENCODER CLEANING REPORT")
+            print("PYTORCH ENCODER CLEANING REPORT")
             print("="*50)
             print(f"PyTorch-specific changes: {len(pytorch_changes)}")
             
@@ -206,7 +206,7 @@ class PyTorchEncoderCleaner(UniversalDataCleaner):
             
             # Show neural network insights
             if self.model is not None:
-                print(f"\n🧠 Model architecture: {self.embedding_dim}D embeddings")
+                print(f"\n Model architecture: {self.embedding_dim}D embeddings")
                 print(f"   Hidden layers: {self.hidden_dim} units")
             print("="*50)
     
