@@ -1,0 +1,7 @@
+id,name,email,rating,review_text,date
+1,John Doe,john@email.com,5,"Great product, loved it!",2024-01-15
+2,Jane Smith,jane@email.com,3,"It was okay, could be better",2024-01-16
+3,Bob Wilson,bob@email.com,4,"Pretty good overall",2024-01-17
+4,Alice Brown,alice@email.com,2,"The product was fine but shipping was slow",2024-01-18
+5,Charlie Davis,,5,"Excellent quality and fast delivery",
+6,Diana Evans,diana@email.com,1,"Terrible experience, product didn't work",2024-01-19
